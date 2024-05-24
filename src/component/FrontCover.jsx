@@ -27,6 +27,7 @@ const FrontCover = () => {
     e.preventDefault();
     // Handle form submission logic
   };
+  
 
   return (
     <div className="front-cover">
