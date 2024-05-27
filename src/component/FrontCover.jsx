@@ -1,60 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 
-import '../css/FrontPage.css';
 
-const FrontCover = () => {
-  const [bookName, setBookName] = useState('');
-  const [authorName, setAuthorName] = useState('');
-  const [frontCover, setFrontCover] = useState('');
-  const [frontCoverData, setFrontCoverData] = useState('');
-
-  const handleBookNameChange = (e) => setBookName(e.target.value);
-  const handleAuthorNameChange = (e) => setAuthorName(e.target.value);
-
-  const handleFrontCoverChange = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFrontCoverData(reader.result);
-    };
-    if (file) {
-      setFrontCover(file);
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission logic
-  };
+const FrontCover = ({setFrontCoverData}) => {
+    const [title, setTitle] = useState("");
+    const [author, setAuthor] = useState("");
+    const [image, setImage] = useState("");
   
 
-  return (
-    <div className="front-cover">
-      <div className="page-container">
-        <h2>Front Cover Page</h2>
-        <div className="page">
-          <textarea className="header-box" value={bookName} onChange={handleBookNameChange}></textarea>
-          <textarea className="written-box" value={`Written By ${authorName}`} onChange={handleAuthorNameChange}></textarea>
-          <img id="frontCover" src={frontCoverData} width="100%" height="100%" alt="Front Cover" />
-        </div>
-      </div>
-      <div className="container">
-        <form method="post" onSubmit={handleSubmit} enctype="multipart/form-data">
-          <label htmlFor="bookName">Name of the Book <span>*</span></label>
-          <input type="text" id="bookName" name="book_name" value={bookName} onChange={handleBookNameChange} placeholder='Enter Book Name Here'/>
-          <label htmlFor="authorName">Author of the Book <span>*</span></label>
-          <input type="text" id="authorName" name="author_name" value={authorName} onChange={handleAuthorNameChange} placeholder='Enter Author Name Here'/>
-          <label htmlFor="frontCover">Upload front cover <span>*</span></label>
-          <input type="file" id="frontCoverInput" name="front_cover" onChange={handleFrontCoverChange} />
-          <input type="text" style={{ display: 'none' }} id="frontencoded" name="front_encoded" value={frontCoverData} readOnly />
+    const handleImageUpload = () => {
+        const data=new FormData();
+        data.append("file",image);
+        data.append("upload_preset","bribooks");
+        data.append("cloud_name","dpxdjfqkk");
+        fetch("https://api.cloudinary.com/v1_1/dpxdjfqkk/image/upload",{
+            method:"post",
+            body:data
+        })
+        .then((res)=>res.json())
+        .then((data)=>{
+            setImage(data.secure_url)
+        })
+    };
+    useEffect(() => {
+        setFrontCoverData({ title, author, setImage });
+      }, [title, author, setImage, setFrontCoverData]);
 
-          <input type="submit" value="Save Changes" />
-        </form>
-        <button className="button" id="frontnextstep">Next Steps</button>
-      </div>
-    </div>
-  );
-};
+    return (
+        <>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", borderBottom: "2px solid orangeRed", padding: "5px" }}>
+            <div style={{ width: "90%",height:"100px", display: "flex",border:"1px solid green", alignItems: "center", justifyContent: "space-around", gap: "3px" }}>
+                    <input
+                        type="text"
+                        placeholder="Write Your Book Title"
+                        style={{ padding: "12px 40px", borderRadius: "10px" }}
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                    />
+                   
+                    <input
+                        type="text"
+                        placeholder="Writer name"
+                        style={{ padding: "12px 40px", borderRadius: "10px" }}
+                        value={author}
+                        onChange={(e) => setAuthor(e.target.value)}
+                    />
+                       <input
+                        type="file"
+                        onChange={handleImageUpload}
+                    />
+                </div>
+            </div>
+
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                height: '80vh',
+                width: '80vh',
+                backgroundImage: `url(${setImage})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                padding: '20px',
+                marginTop: "10px",
+                textShadow: '2px 2px 4px rgba(0,0,0,0.7)',
+                margin: 'auto',
+                border: '30px solid #c2e7ff',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+            }}>
+                <h1 style={{ fontSize: '4.5em', textAlign: "center" }}>{title}</h1>
+                <h3 style={{ marginLeft: "6rem" }}>Written By: {author}</h3>
+            </div>
+        </>
+    );
+}
 
 export default FrontCover;
