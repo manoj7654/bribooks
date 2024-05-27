@@ -1,30 +1,23 @@
 import React, { useState,useEffect } from 'react';
 
 
-const FrontCover = ({setFrontCoverData}) => {
+const FrontCover = () => {
     const [title, setTitle] = useState("");
     const [author, setAuthor] = useState("");
     const [image, setImage] = useState("");
   
 
-    const handleImageUpload = () => {
-        const data=new FormData();
-        data.append("file",image);
-        data.append("upload_preset","bribooks");
-        data.append("cloud_name","dpxdjfqkk");
-        fetch("https://api.cloudinary.com/v1_1/dpxdjfqkk/image/upload",{
-            method:"post",
-            body:data
-        })
-        .then((res)=>res.json())
-        .then((data)=>{
-            setImage(data.secure_url)
-        })
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                setImage(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
     };
-    useEffect(() => {
-        setFrontCoverData({ title, author, setImage });
-      }, [title, author, setImage, setFrontCoverData]);
-
+    
     return (
         <>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", borderBottom: "2px solid orangeRed", padding: "5px" }}>
@@ -58,7 +51,7 @@ const FrontCover = ({setFrontCoverData}) => {
                 justifyContent: 'space-between',
                 height: '80vh',
                 width: '80vh',
-                backgroundImage: `url(${setImage})`,
+                backgroundImage: `url(${image})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 padding: '20px',
